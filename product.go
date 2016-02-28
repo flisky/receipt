@@ -10,6 +10,6 @@ type Product struct {
 	price    float64
 }
 
-func fetchProducts(productIds []string) (products map[string]*Product, fully bool) {
+func fetchProducts(productIds []string) (products map[string]*Product, missing []string) {
 	return
 }

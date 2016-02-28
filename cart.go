@@ -18,7 +18,9 @@ type item struct {
 	discountPrice    float64
 }
 
-type Cart []*item
+type Cart struct {
+	items []*item
+}
 
 var errorBadProduct = errors.New("Product not found")
 var errorBadQuantity = errors.New("Quantity illegal")

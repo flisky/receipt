@@ -7,12 +7,12 @@ const (
 )
 
 var discountType = map[int]DiscountType{
-	DiscountPercentage95: DiscountPercentage{"九五折", 0.95, 0},
-	DiscountBuy2Free1:    DiscountFree{"买二赠一", 3, 1},
+	DiscountPercentage95: &DiscountPercentage{"九五折", 0.95, 0},
+	DiscountBuy2Free1:    &DiscountFree{"买二赠一", 3, 1},
 }
 
 // 当前折扣信息缓存
-var discounts []*Discount
+var Discounts map[int]*Discount
 
 type Discount struct {
 	id         int

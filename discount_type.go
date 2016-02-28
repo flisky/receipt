@@ -7,7 +7,7 @@ type DiscountType interface {
 	process(*item)
 }
 
-type PercentageDiscount struct {
+type DiscountPercentage struct {
 	description string
 	percentage  float64
 	threshold   float64
@@ -20,7 +20,7 @@ type DiscountFree struct {
 }
 
 func (p *DiscountPercentage) satisfied(item *item) bool {
-	if item.paid >= item.threshold {
+	if item.paid >= p.threshold {
 		return true
 	}
 	return false

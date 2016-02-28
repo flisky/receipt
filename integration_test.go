@@ -17,15 +17,21 @@ func TestIntegration(t *testing.T) {
 	}{
 		{
 			ProductId(1),
-			1.11,
+			1,
 			"Product 1",
-			"kilo",
+			"kilogram",
+		},
+		{
+			ProductId(2),
+			2,
+			"Product 2",
+			"Piece",
 		},
 	}
 	for _, values := range tables {
 		db.MustExec(`INSERT INTO product(id, price, name, unitname) values(?, ?, ?, ?)`, values...)
 	}
-	cart, err := NewCart(map[string]float64{"1": 1})
+	cart, err := NewCart(map[string]float64{"1": 1, "2": 7})
 	if err != nil {
 		t.Errorf("expected no error, got %s", err)
 	}
@@ -33,15 +39,15 @@ func TestIntegration(t *testing.T) {
 	discountData := [...][]interface{}{
 		{
 			1,
-			1,
+			DiscountPercentage95,
 			"",
 			"[1]",
 		},
 		{
 			2,
-			2,
+			DiscountBuy2Free1,
 			"",
-			"[1]",
+			"[2]",
 		},
 	}
 	for _, values := range discountData {
@@ -54,4 +60,16 @@ func TestIntegration(t *testing.T) {
 	}
 
 	cart.Checkout()
+	for _, item := range cart.items {
+		switch item.product.Id {
+		case ProductId(1):
+			if item.paid != 1*1*0.95 {
+				t.Errorf("discount percentage calculated error")
+			}
+		case ProductId(2):
+			if item.paid != 2*(7-2) {
+				t.Errorf("discount free caculated error")
+			}
+		}
+	}
 }

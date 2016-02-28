@@ -27,13 +27,13 @@ func (p *DiscountPercentage) satisfied(item *item) bool {
 }
 
 func (p *DiscountPercentage) process(item *item) {
-	item.discountPrice = item.total * p.percentage
+	item.discountPrice = item.total * (1 - p.percentage)
 	item.discount += item.discountPrice
 	item.paid -= item.discount
 }
 
 func (p *DiscountFree) satisfied(item *item) bool {
-	if item.quantity >= item.total {
+	if item.quantity >= p.total {
 		return true
 	}
 	return false

@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"text/template"
 
-	receipt ".."
+	"github.com/flisky/receipt"
 )
 
-var templates = template.Must(template.ParseGlob("templates/*"))
+var templates = template.Must(template.ParseGlob("templates/*.txt"))
 
 func receiptHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -35,7 +35,7 @@ func receiptHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	cart.Checkout()
 
-	if err := templates.ExecuteTemplate(w, "text", cart); err != nil {
+	if err := templates.ExecuteTemplate(w, "cart.txt", cart); err != nil {
 		log.Printf("template render error: %s", err)
 	}
 }
@@ -47,5 +47,7 @@ func init() {
 
 func main() {
 	http.HandleFunc("/", receiptHandler)
-	http.ListenAndServe(":8080", nil)
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		panic(err)
+	}
 }

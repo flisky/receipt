@@ -1,0 +1,17 @@
+***<没钱赚商店>购物清单***
+{{range .Items -}}
+名称：{{.Product.Name}}，数量：{{.Quantity}}{{.Product.UnitName}}，单价：{{.Product.Price | printf "%.2f" }}(元)，小计：{{.Paid | printf "%.2f" }}(元){{if .DiscountPrice}}，节省{{.DiscountPrice | printf "%.2f" }}(元){{end}}
+{{end -}}
+{{with .FreeItems -}}
+{{if . -}}
+----------------------
+赠送商品：
+{{range . -}}
+名称：{{.Product.Name}}，数量：{{.DiscountQuantity}}{{.Product.UnitName}}
+{{end -}}
+{{end -}}
+{{end -}}
+----------------------
+总计：{{.Paid | printf "%.2f" }}(元)
+节省：{{.Discount | printf "%.2f" }}(元)
+*********************

@@ -60,14 +60,14 @@ func TestIntegration(t *testing.T) {
 	}
 
 	cart.Checkout()
-	for _, item := range cart.items {
-		switch item.product.Id {
+	for _, item := range cart.Items {
+		switch item.Product.Id {
 		case ProductId(1):
-			if item.paid != 1*1*0.95 {
+			if item.Paid != 1*1*0.95 {
 				t.Errorf("discount percentage calculated error")
 			}
 		case ProductId(2):
-			if item.paid != 2*(7-2) {
+			if item.Paid != 2*(7-2) {
 				t.Errorf("discount free caculated error")
 			}
 		}

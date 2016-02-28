@@ -6,20 +6,21 @@ import (
 )
 
 type item struct {
-	product  *Product
-	quantity float64
-	price    float64
-
-	total            float64
-	paid             float64
-	discount         float64
-	discounts        []*Discount
-	discountQuantity float64
-	discountPrice    float64
+	Product          *Product
+	Quantity         float64
+	Total            float64
+	Paid             float64
+	Discount         float64
+	DiscountPrice    float64
+	DiscountQuantity float64
+	Discounts        []*Discount
 }
 
 type Cart struct {
-	items []*item
+	Items    []*item
+	Total    float64
+	Paid     float64
+	Discount float64
 }
 
 var errorBadProductId = errors.New("ProductID illegal")
@@ -31,12 +32,11 @@ func NewItem(product *Product, quantity float64) (*item, error) {
 		return nil, errorBadQuantity
 	}
 	it := item{
-		product:  product,
-		quantity: quantity,
-		price:    product.Price,
+		Product:  product,
+		Quantity: quantity,
 	}
-	it.total = it.quantity * it.price
-	it.paid = it.total
+	it.Total = it.Quantity * it.Product.Price
+	it.Paid = it.Total
 	return &it, nil
 }
 
@@ -58,20 +58,20 @@ func NewCart(mapping map[string]float64) (*Cart, error) {
 		return nil, errorBadProduct
 	}
 	cart := Cart{}
-	cart.items = make([]*item, 0, len(mapping))
+	cart.Items = make([]*item, 0, len(mapping))
 	for productId, quantity := range productMapping {
 		item, err := NewItem(products[productId], quantity)
 		if err != nil {
 			log.Printf("item init error '%s' with pid %s & quantity %f", err, productId, quantity)
 			return nil, err
 		}
-		cart.items = append(cart.items, item)
+		cart.Items = append(cart.Items, item)
 	}
 	return &cart, nil
 }
 
 func (cart *Cart) Checkout() {
-	for _, item := range cart.items {
+	for _, item := range cart.Items {
 		// 挑选潜在的折扣
 		discounts := make(map[int]*Discount)
 		for id, discount := range Discounts {
@@ -99,5 +99,20 @@ func (cart *Cart) Checkout() {
 		for _, discount := range discounts {
 			discount.process(item)
 		}
+		cart.Paid += item.Paid
+		cart.Discount += item.Discount
+		cart.Total += item.Total
 	}
+	if cart.Total != cart.Paid+cart.Discount {
+		log.Printf("cart price out of sync!")
+	}
+}
+
+func (cart *Cart) FreeItems() (items []*item) {
+	for _, item := range cart.Items {
+		if item.DiscountQuantity > 0 {
+			items = append(items, item)
+		}
+	}
+	return
 }

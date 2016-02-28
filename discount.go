@@ -22,7 +22,7 @@ type Discount struct {
 }
 
 func (d *Discount) satisfied(item *item) bool {
-	if d.productIds[item.product.id] && d.DiscountType.satisfied(item) {
+	if d.productIds[item.product.Id] && d.DiscountType.satisfied(item) {
 		return true
 	}
 	return false

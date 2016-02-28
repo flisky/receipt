@@ -5,9 +5,10 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-var db = sqlx.MustConnect("sqlite3", "./db.sqlite3")
+var db *sqlx.DB
 
-func init() {
+func PrepareDB(dataSource string) {
+	db = sqlx.MustConnect("sqlite3", dataSource)
 	db.MustExec(`CREATE TABLE IF NOT EXISTS product (
 		id INTEGER PRIMARY KEY,
 		price FLOAT,

@@ -33,7 +33,7 @@ func NewItem(product *Product, quantity float64) (*item, error) {
 	it := item{
 		product:  product,
 		quantity: quantity,
-		price:    product.price,
+		price:    product.Price,
 	}
 	it.total = it.quantity * it.price
 	it.paid = it.total
@@ -42,7 +42,7 @@ func NewItem(product *Product, quantity float64) (*item, error) {
 
 func NewCart(mapping map[string]float64) (*Cart, error) {
 	productMapping := make(map[ProductId]float64, len(mapping))
-	productIds := make([]ProductId, len(mapping))
+	productIds := make([]ProductId, 0, len(mapping))
 	for pid, value := range mapping {
 		productId, err := NewProductId(pid)
 		if err != nil {
@@ -58,7 +58,7 @@ func NewCart(mapping map[string]float64) (*Cart, error) {
 		return nil, errorBadProduct
 	}
 	cart := Cart{}
-	cart.items = make([]*item, len(mapping))
+	cart.items = make([]*item, 0, len(mapping))
 	for productId, quantity := range productMapping {
 		item, err := NewItem(products[productId], quantity)
 		if err != nil {

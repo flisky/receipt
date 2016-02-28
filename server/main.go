@@ -40,6 +40,10 @@ func receiptHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func init() {
+	receipt.PrepareDB("./db.sqlite3")
+}
+
 func main() {
 	http.HandleFunc("/", receiptHandler)
 	http.ListenAndServe(":8080", nil)

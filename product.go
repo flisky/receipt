@@ -7,11 +7,11 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type ProductId uint64
+type ProductId int64
 
 type Product struct {
-	id       ProductId
-	price    float64
+	Id       ProductId
+	Price    float64
 	Name     string
 	UnitName string
 }
@@ -24,24 +24,30 @@ func NewProductId(pid string) (ProductId, error) {
 	return ProductId(value), nil
 }
 
-func fetchProducts(productIds []ProductId) (products map[ProductId]*Product, missing []ProductId) {
+func fetchProducts(productIds []ProductId) (map[ProductId]*Product, []ProductId) {
 	query, args, _ := sqlx.In("SELECT * FROM product WHERE id IN (?)", productIds)
 	query = db.Rebind(query)
 	rows, err := db.Queryx(query, args...)
 	if err != nil {
 		log.Printf("[DB]query product fail %s", err)
-		missing = productIds
-		return
+		return nil, productIds
 	}
+	products := make(map[ProductId]*Product)
 	for rows.Next() {
 		product := Product{}
-		rows.StructScan(&product)
-		products[product.id] = &product
+		if err := rows.StructScan(&product); err != nil {
+			log.Printf("%s", err)
+		}
+		products[product.Id] = &product
 	}
+	if len(productIds) == len(products) {
+		return products, nil
+	}
+	missing := make([]ProductId, 0, len(productIds)-len(products))
 	for _, productId := range productIds {
 		if _, ok := products[productId]; !ok {
 			missing = append(missing, productId)
 		}
 	}
-	return
+	return products, missing
 }

@@ -22,6 +22,7 @@ type Cart struct {
 	items []*item
 }
 
+var errorBadProductId = errors.New("ProductID illegal")
 var errorBadProduct = errors.New("Product not found")
 var errorBadQuantity = errors.New("Quantity illegal")
 
@@ -39,10 +40,17 @@ func NewItem(product *Product, quantity float64) (*item, error) {
 	return &it, nil
 }
 
-func NewCart(productMap map[string]float64) (*Cart, error) {
-	productIds := make([]string, len(productMap))
-	for productId := range productMap {
+func NewCart(mapping map[string]float64) (*Cart, error) {
+	productMapping := make(map[ProductId]float64, len(mapping))
+	productIds := make([]ProductId, len(mapping))
+	for pid, value := range mapping {
+		productId, err := NewProductId(pid)
+		if err != nil {
+			log.Printf("[ProductId]init error %s", pid)
+			return nil, errorBadProductId
+		}
 		productIds = append(productIds, productId)
+		productMapping[productId] = value
 	}
 	products, missing := fetchProducts(productIds)
 	if missing != nil {
@@ -50,8 +58,8 @@ func NewCart(productMap map[string]float64) (*Cart, error) {
 		return nil, errorBadProduct
 	}
 	cart := Cart{}
-	cart.items = make([]*item, len(productMap))
-	for productId, quantity := range productMap {
+	cart.items = make([]*item, len(mapping))
+	for productId, quantity := range productMapping {
 		item, err := NewItem(products[productId], quantity)
 		if err != nil {
 			log.Printf("[Item]init error %s with pid %s & quantity %f", err, productId, quantity)

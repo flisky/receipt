@@ -46,7 +46,7 @@ func NewCart(mapping map[string]float64) (*Cart, error) {
 	for pid, value := range mapping {
 		productId, err := NewProductId(pid)
 		if err != nil {
-			log.Printf("[ProductId]init error %s", pid)
+			log.Printf("ProductId init error: %s", pid)
 			return nil, errorBadProductId
 		}
 		productIds = append(productIds, productId)
@@ -54,7 +54,7 @@ func NewCart(mapping map[string]float64) (*Cart, error) {
 	}
 	products, missing := fetchProducts(productIds)
 	if missing != nil {
-		log.Printf("[Product]cannot find product %v", missing)
+		log.Printf("Product cannot find: %v", missing)
 		return nil, errorBadProduct
 	}
 	cart := Cart{}
@@ -62,7 +62,7 @@ func NewCart(mapping map[string]float64) (*Cart, error) {
 	for productId, quantity := range productMapping {
 		item, err := NewItem(products[productId], quantity)
 		if err != nil {
-			log.Printf("[Item]init error %s with pid %s & quantity %f", err, productId, quantity)
+			log.Printf("item init error '%s' with pid %s & quantity %f", err, productId, quantity)
 			return nil, err
 		}
 		cart.items = append(cart.items, item)
@@ -86,7 +86,7 @@ func (cart *Cart) Checkout() {
 				for _, id := range ids {
 					ids = append(ids, id)
 				}
-				log.Printf("[Discount]conflict from %d with discounts %v", id, ids)
+				log.Printf("discount conflict from %d with discounts %v", id, ids)
 			}
 		}
 		// 剔除不可用的折扣

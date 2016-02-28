@@ -21,14 +21,14 @@ func receiptHandler(w http.ResponseWriter, r *http.Request) {
 	// "Object than Array" is a best practice:)
 	products := make(map[string]float64)
 	if err := decoder.Decode(&products); err != nil {
-		log.Printf("[request]json decoder error: %s", err)
+		log.Printf("request json decoder error: %s", err)
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
 	cart, err := receipt.NewCart(products)
 	if err != nil {
-		log.Printf("[cart]generate error: %s", err)
+		log.Printf("cart generate error: %s", err)
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 
@@ -36,7 +36,7 @@ func receiptHandler(w http.ResponseWriter, r *http.Request) {
 	cart.Checkout()
 
 	if err := templates.ExecuteTemplate(w, "text", cart); err != nil {
-		log.Printf("[template]render error: %s", err)
+		log.Printf("template render error: %s", err)
 	}
 }
 

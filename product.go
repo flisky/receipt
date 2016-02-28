@@ -29,7 +29,7 @@ func fetchProducts(productIds []ProductId) (map[ProductId]*Product, []ProductId)
 	query = db.Rebind(query)
 	rows, err := db.Queryx(query, args...)
 	if err != nil {
-		log.Printf("[DB]query product fail %s", err)
+		log.Printf("DB query product fail %s", err)
 		return nil, productIds
 	}
 	products := make(map[ProductId]*Product)

@@ -9,3 +9,7 @@ type Product struct {
 	unit     float64
 	price    float64
 }
+
+func fetchProducts(productIds []string) (products map[string]*Product, fully bool) {
+	return
+}

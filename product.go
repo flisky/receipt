@@ -7,6 +7,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+// language store uint64 as int64 in the database
 type ProductId int64
 
 type Product struct {
@@ -17,7 +18,7 @@ type Product struct {
 }
 
 func NewProductId(pid string) (ProductId, error) {
-	value, err := strconv.ParseUint(pid, 10, 64)
+	value, err := strconv.ParseInt(pid, 10, 64)
 	if err != nil {
 		return ProductId(0), err
 	}

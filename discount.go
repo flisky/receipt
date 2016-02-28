@@ -1,5 +1,10 @@
 package receipt
 
+import (
+	"encoding/json"
+	"log"
+)
+
 const (
 	_ = iota
 	DiscountPercentage95
@@ -50,4 +55,34 @@ func checkConflict(discounts map[int]*Discount, dids []int, id int) bool {
 		}
 	}
 	return false
+}
+
+func LoadDiscounts() {
+	Discounts = make(map[int]*Discount)
+	rows, _ := db.Query("SELECT id, discounttype, disabled, productids FROM discount")
+	for rows.Next() {
+		var id, discounttype int
+		var disabled, productids []byte
+		rows.Scan(&id, &discounttype, &disabled, &productids)
+		var discountIds, productIds []int
+		if len(disabled) > 0 {
+			if err := json.Unmarshal(disabled, &discountIds); err != nil {
+				log.Printf("field disabled json decode error '%s' with discount %d", err, id)
+				continue
+			}
+		}
+		if len(productids) > 0 {
+			if err := json.Unmarshal(productids, &productIds); err != nil {
+				log.Printf("field productids json decode error '%s' with discount %d", err, id)
+				continue
+			}
+		}
+		productIdSet := make(map[ProductId]bool, len(productIds))
+		for _, productid := range productIds {
+			productIdSet[ProductId(productid)] = true
+		}
+		discount := &Discount{id: id, disabled: discountIds, productIds: productIdSet}
+		discount.DiscountType = discountType[discounttype]
+		Discounts[id] = discount
+	}
 }

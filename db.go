@@ -18,9 +18,8 @@ func PrepareDB(dataSource string) {
 	db.MustExec(`CREATE TABLE IF NOT EXISTS discount (
 		id INTEGER PRIMARY KEY,
 		discounttype INTEGER,
-		description VARCHAR(128) NULL,
 		disabled TEXT NULL,
-		productIds TEXT NULL
+		productids TEXT NULL
 	);`)
 
 }

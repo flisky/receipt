@@ -1,11 +1,11 @@
 package receipt
 
-import (
-	"os"
-	"testing"
-)
+import "testing"
 
 func TestNewCart(t *testing.T) {
+	PrepareDB(":memory:")
+	defer db.Close()
+
 	if _, err := NewCart(map[string]float64{"illegal-product-id": 1}); err != errorBadProductId {
 		t.Errorf("expected errorBadProductId, got %s", err)
 	}
@@ -28,9 +28,4 @@ func TestNewCart(t *testing.T) {
 	if _, err := NewCart(map[string]float64{"1": 1}); err != nil {
 		t.Errorf("expected no error, got %s", err)
 	}
-}
-
-func TestMain(m *testing.M) {
-	PrepareDB(":memory:")
-	os.Exit(m.Run())
 }

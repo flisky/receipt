@@ -29,7 +29,7 @@ func receiptHandler(w http.ResponseWriter, r *http.Request) {
 	cart, err := receipt.NewCart(products)
 	if err != nil {
 		log.Printf("[cart]generate error: %s", err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 
 	}

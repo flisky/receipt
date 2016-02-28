@@ -44,21 +44,52 @@ func NewCart(productMap map[string]float64) (*Cart, error) {
 	for productId := range productMap {
 		productIds = append(productIds, productId)
 	}
-	products, fully := fetchProducts(productIds)
-	if fully == false {
+	products, missing := fetchProducts(productIds)
+	if missing != nil {
+		log.Printf("[Product]cannot find product %v", missing)
 		return nil, errorBadProduct
 	}
-	cart := make(Cart, len(productMap))
+	cart := Cart{}
+	cart.items = make([]*item, len(productMap))
 	for productId, quantity := range productMap {
 		item, err := NewItem(products[productId], quantity)
 		if err != nil {
 			log.Printf("[Item]init error %s with pid %s & quantity %f", err, productId, quantity)
 			return nil, err
 		}
-		cart = append(cart, item)
+		cart.items = append(cart.items, item)
 	}
 	return &cart, nil
 }
 
-func (c *Cart) Checkout() {
+func (cart *Cart) Checkout() {
+	for _, item := range cart.items {
+		// 挑选潜在的折扣
+		discounts := make(map[int]*Discount)
+		for id, discount := range Discounts {
+			if discount.satisfied(item) {
+				discounts[id] = discount
+			}
+		}
+		// Enhanced: 健康检查：折扣间的排它是否有冲突
+		for id := range discounts {
+			if checkConflict(discounts, []int{}, id) {
+				ids := make([]int, len(discounts))
+				for _, id := range ids {
+					ids = append(ids, id)
+				}
+				log.Printf("[Discount]conflict from %d with discounts %v", id, ids)
+			}
+		}
+		// 剔除不可用的折扣
+		for _, discount := range discounts {
+			for _, did := range discount.disabled {
+				delete(discounts, did)
+			}
+		}
+		// 应用折扣
+		for _, discount := range discounts {
+			discount.process(item)
+		}
+	}
 }

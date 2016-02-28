@@ -27,3 +27,27 @@ func (d *Discount) satisfied(item *item) bool {
 	}
 	return false
 }
+
+func checkConflict(discounts map[int]*Discount, dids []int, id int) bool {
+	discount, ok := discounts[id]
+	if !ok {
+		return false
+	}
+	dids = append(dids, id)
+	for _, did := range discount.disabled {
+		if _, ok := discounts[did]; ok {
+			if dids[0] == did {
+				return true
+			}
+			if Discounts[did].disabled != nil {
+				copies := make([]int, len(dids)+1)
+				copy(dids, copies)
+				copies = append(copies, did)
+				return checkConflict(discounts, copies, did)
+			} else {
+				return false
+			}
+		}
+	}
+	return false
+}
